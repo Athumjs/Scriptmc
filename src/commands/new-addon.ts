@@ -1,0 +1,139 @@
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
+import { v4 as uuidv4 } from "uuid";
+
+export function new_addon(
+  name: string,
+  description: string,
+  res: string
+): void {
+  const pathMine: string[] = getFolder(name);
+  if (pathMine.length <= 0) return;
+  const behavior_uuid: string = uuidv4();
+  const resource_uuid: string = uuidv4();
+  const behavior_manifest: string = `{
+  "format_version": 2,
+  "header": {
+    "name": "${name}",
+    "description": "${description}",
+    "uuid": "${behavior_uuid}",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 20]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "${uuidv4()}",
+      "version": [1, 0, 0]
+    },
+    ${
+      res === "y"
+        ? `{
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "${uuidv4()}",
+      "version": [1, 0, 0]
+    }`
+        : ""
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "${resource_uuid}",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "1.19.0"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "1.3.0"
+    }
+  ]
+}
+`;
+  const resource_manifest: string = `{
+  "format_version": 2,
+  "header": {
+    "name": "${name}",
+    "description": "${description}",
+    "uuid": "${resource_uuid}",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 20]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "${uuidv4()}",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "${behavior_uuid}",
+      "version": [1, 0, 0]
+    }
+  ]
+}
+`;
+  fs.writeFileSync(`${pathMine[0]}/manifest.json`, behavior_manifest);
+  fs.writeFileSync(`${pathMine[1]}/manifest.json`, resource_manifest);
+  if (res === "y") {
+    fs.mkdirSync(`${pathMine[0]}/scripts`);
+    fs.writeFileSync(
+      `${pathMine[0]}/scripts/main.js`,
+      `import { world } from "@minecraft/server"\n\nworld.afterEvents.itemUse.subscribe((data) => {
+  const { source, itemStack } = data;
+  world.sendMessage(\`\${source.name} used item \${itemStack?.typeId}\`);
+})`
+    );
+  }
+  console.log(`\x1b[1;32mAddon created successfully: ${name}\x1b[0m`);
+}
+
+function getFolder(name: string): string[] {
+  const pathMine: string = fs.readFileSync(
+    path.join(__dirname, "../../path.config"),
+    "utf-8"
+  );
+  if (
+    fs.existsSync(
+      path.join(os.homedir(), pathMine, "development_behavior_packs", name)
+    ) &&
+    fs.existsSync(
+      path.join(os.homedir(), pathMine, "development_resource_packs", name)
+    )
+  ) {
+    console.log(`\x1b[1;31mAddon already exists: ${name}\x1b[0m`);
+    return [];
+  }
+  if (
+    !fs.existsSync(
+      path.join(os.homedir(), pathMine, "development_behavior_packs")
+    )
+  )
+    fs.mkdirSync(
+      path.join(os.homedir(), pathMine, "development_behavior_packs")
+    );
+  if (
+    !fs.existsSync(
+      path.join(os.homedir(), pathMine, "development_resource_packs")
+    )
+  )
+    fs.mkdirSync(
+      path.join(os.homedir(), pathMine, "development_resource_packs")
+    );
+  fs.mkdirSync(
+    path.join(os.homedir(), pathMine, "development_behavior_packs", name)
+  );
+  fs.mkdirSync(
+    path.join(os.homedir(), pathMine, "development_resource_packs", name)
+  );
+  return [
+    path.join(os.homedir(), pathMine, "development_behavior_packs", name),
+    path.join(os.homedir(), pathMine, "development_resource_packs", name),
+  ];
+}
