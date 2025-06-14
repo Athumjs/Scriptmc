@@ -6,7 +6,8 @@ import { v4 as uuidv4 } from "uuid";
 export function new_addon(
   name: string,
   description: string,
-  res: string
+  script: string,
+  language: string
 ): void {
   const pathMine: string[] = getFolder(name);
   if (pathMine.length <= 0) return;
@@ -28,11 +29,11 @@ export function new_addon(
       "version": [1, 0, 0]
     },
     ${
-      res === "y"
+      script === "Yes"
         ? `{
       "type": "script",
       "language": "javascript",
-      "entry": "scripts/main.js",
+      "entry": "scripts/${language === "Typescript" ? "smc/" : ""}main.js",
       "uuid": "${uuidv4()}",
       "version": [1, 0, 0]
     }`
@@ -81,10 +82,12 @@ export function new_addon(
 `;
   fs.writeFileSync(`${pathMine[0]}/manifest.json`, behavior_manifest);
   fs.writeFileSync(`${pathMine[1]}/manifest.json`, resource_manifest);
-  if (res === "y") {
+  if (script === "Yes") {
     fs.mkdirSync(`${pathMine[0]}/scripts`);
     fs.writeFileSync(
-      `${pathMine[0]}/scripts/main.js`,
+      `${pathMine[0]}/scripts/${
+        language === "Typescript" ? "main.ts" : "main.js"
+      }`,
       `import { world } from "@minecraft/server"\n\nworld.afterEvents.itemUse.subscribe((data) => {
   const { source, itemStack } = data;
   world.sendMessage(\`\${source.name} used item \${itemStack?.typeId}\`);

@@ -28,4 +28,7 @@ export const list: List[] = [
     name: "--path",
     flag: "-p",
   },
+  {
+    name: "start",
+  },
 ];
