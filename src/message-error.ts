@@ -34,10 +34,10 @@ export function message_error(): void {
         " ".repeat(
           process.stdout.columns / 2 -
             " Show commands: smc --help".length -
-            "Scriptmc version: 0.0.1 ".length -
+            "Scriptmc version: 1.0.3 ".length -
             3
         ) +
-        "\x1b[34mScriptmc version: \x1b[0m0.0.1\x1b[1;31m " +
+        "\x1b[34mScriptmc version: \x1b[0m1.0.3\x1b[1;31m " +
         "│"
     );
     console.log("└" + "─".repeat(process.stdout.columns / 2 - 3) + "┘");
@@ -75,10 +75,10 @@ export function message_error(): void {
         " ".repeat(
           process.stdout.columns / 2 -
             " Show commands: smc --help".length -
-            "Scriptmc version: 0.0.1 ".length -
+            "Scriptmc version: 1.0.3 ".length -
             3
         ) +
-        "\x1b[34mScriptmc version: \x1b[0m0.0.1\x1b[1;31m " +
+        "\x1b[34mScriptmc version: \x1b[0m1.0.3\x1b[1;31m " +
         "│"
     );
     console.log("└" + "─".repeat(process.stdout.columns / 2 - 3) + "┘");

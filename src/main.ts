@@ -15,7 +15,7 @@ async function main(): Promise<void> {
     const args: string[] = validArgs().value as string[];
     const arg: string = args.filter((value) => value !== "").join("");
     if (arg.startsWith("-v") || arg.startsWith("--version")) {
-      console.log("\x1b[34mVersion: \x1b[0m1.0.2");
+      console.log("\x1b[34mVersion: \x1b[0m1.0.3");
     } else if (arg.startsWith("-h") || arg.startsWith("--help")) {
       message_help();
     } else if (arg.startsWith("-n") || arg.startsWith("--new")) {
