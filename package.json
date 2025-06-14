@@ -1,6 +1,6 @@
 {
   "name": "scriptmc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "scriptmc is a cli for minecraft bedrock addons creators",
   "bin": {
     "smc": "dist/main.js"
@@ -22,13 +22,16 @@
   "author": "athumjs",
   "license": "MIT",
   "type": "commonjs",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "chokidar": "^4.0.3",
+    "esbuild": "^0.25.5",
+    "inquirer": "^12.6.3",
+    "uuid": "^11.1.0"
+  },
   "devDependencies": {
     "@types/archiver": "^6.0.3",
     "@types/node": "^24.0.1",
     "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "archiver": "^7.0.1",
-    "uuid": "^11.1.0"
   }
 }
