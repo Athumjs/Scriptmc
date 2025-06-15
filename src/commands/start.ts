@@ -7,14 +7,14 @@ import os from "node:os";
 export function start(name: string): void {
   const pathMine: string = getFolder(name);
   if (!pathMine) return;
-  const watcher = chokidar.watch(path.join(pathMine, "scripts"), {
+  const watcher = chokidar.watch(path.join(pathMine, "scriptmc"), {
     ignoreInitial: true,
   });
 
   watcher.on("change", (pathFile) => {
     build({
-      entryPoints: [path.join(pathMine, "scripts/**/*.ts")],
-      outdir: path.join(pathMine, "smc"),
+      entryPoints: [path.join(pathMine, "scriptmc/**/*.ts")],
+      outdir: path.join(pathMine, "scripts"),
       platform: "node",
       target: "esnext",
       format: "esm",
@@ -43,20 +43,12 @@ function getFolder(name: string): string {
   );
   if (
     !fs.existsSync(
-      path.join(os.homedir(), pathMine, "development_behavior_packs", name)
-    )
-  ) {
-    console.log(`\x1b[1;31mAddon not found: ${name}\x1b[0m`);
-    return "";
-  }
-  if (
-    !fs.existsSync(
       path.join(
         os.homedir(),
         pathMine,
         "development_behavior_packs",
         name,
-        "scripts",
+        "scriptmc",
         "main.ts"
       )
     )

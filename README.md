@@ -12,6 +12,7 @@ A CLI tool that simplifies the creation and build process of Minecraft Bedrock a
 - 🛠 Auto-generate `manifest.json` and folders
 - 📦 Build and bundle your addon for Bedrock Edition
 - 🎮 Compatible with Minecraft Preview & official releases
+- ↪️ TS Support and watch mode
 
 ---
 
