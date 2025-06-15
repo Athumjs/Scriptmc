@@ -29,13 +29,11 @@ export function new_addon(
       "version": [1, 0, 0]
     },
     ${
-      script.includes("Yes")
+      script
         ? `{
       "type": "script",
       "language": "javascript",
-      "entry": "${
-        language.includes("Typescript") ? "smc/" : "scripts/"
-      }main.js",
+      "entry": "scripts/main.js",
       "uuid": "${uuidv4()}",
       "version": [1, 0, 0]
     }`
@@ -84,11 +82,15 @@ export function new_addon(
 `;
   fs.writeFileSync(`${pathMine[0]}/manifest.json`, behavior_manifest);
   fs.writeFileSync(`${pathMine[1]}/manifest.json`, resource_manifest);
-  if (script.includes("Yes")) {
-    fs.mkdirSync(`${pathMine[0]}/scripts`);
+  if (script) {
+    fs.mkdirSync(
+      `${pathMine[0]}/${
+        language.includes("Typescript") ? "scriptmc" : "scripts"
+      }`
+    );
     fs.writeFileSync(
-      `${pathMine[0]}/scripts/${
-        language.includes("Typescript") ? "main.ts" : "main.js"
+      `${pathMine[0]}/${
+        language.includes("Typescript") ? "scriptmc/main.ts" : "scripts/main.js"
       }`,
       `import { world } from "@minecraft/server"\n\nworld.afterEvents.itemUse.subscribe((data) => {
   const { source, itemStack } = data;

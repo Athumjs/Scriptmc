@@ -1,6 +1,6 @@
 {
   "name": "scriptmc",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "scriptmc is a cli for minecraft bedrock addons creators",
   "bin": {
     "smc": "dist/main.js"
@@ -9,7 +9,8 @@
     "dist",
     "README.md",
     "path.config",
-    "LICENSE"
+    "LICENSE",
+    "package.json"
   ],
   "keywords": [
     "scriptmc",

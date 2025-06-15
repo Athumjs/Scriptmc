@@ -39,17 +39,6 @@ function getFolder(nameB: string, nameR: string): string[] {
     path.join(__dirname, "../../path.config"),
     "utf-8"
   );
-  if (
-    !fs.existsSync(
-      path.join(os.homedir(), pathMine, "development_behavior_packs", nameB)
-    ) &&
-    !fs.existsSync(
-      path.join(os.homedir(), pathMine, "development_resource_packs", nameR)
-    )
-  ) {
-    console.log(`\x1b[1;31mAddon not found: ${nameB} &  ${nameR}\x1b[0m`);
-    return [];
-  }
   if (!fs.existsSync(path.join(os.homedir(), pathMine, "scriptmc-exports")))
     fs.mkdirSync(path.join(os.homedir(), pathMine, "scriptmc-exports"));
   return [
