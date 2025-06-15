@@ -7,21 +7,33 @@ import os from "node:os";
 export function start(name: string): void {
   const pathMine: string = getFolder(name);
   if (!pathMine) return;
-  const watcher = chokidar.watch(path.join(pathMine, "scripts", "main.ts"), {
+  const watcher = chokidar.watch(path.join(pathMine, "scripts"), {
     ignoreInitial: true,
   });
 
-  watcher.on("all", () => {
+  watcher.on("change", (pathFile) => {
     build({
-      entryPoints: [path.join(pathMine, "scripts", "main.ts")],
-      outfile: path.join(pathMine, "scripts", "smc", "main.js"),
-      bundle: true,
+      entryPoints: [path.join(pathMine, "scripts/**/*.ts")],
+      outdir: path.join(pathMine, "smc"),
       platform: "node",
       target: "esnext",
       format: "esm",
-      external: ["@minecraft/server", "@minecraft/server-ui"],
     });
+    console.clear();
+    console.log(
+      `\x1b[1;32mTranspiled \x1b[3;33m${path.basename(
+        pathFile
+      )}\x1b[1;32m file\x1b[0m`
+    );
   });
+
+  console.log(
+    `\x1b[1;32mTranspilation enabled (edit \x1b[3;33m${path.join(
+      pathMine,
+      "scripts",
+      "main.ts"
+    )}\x1b[1;32m file)\x1b[0m`
+  );
 }
 
 function getFolder(name: string): string {
