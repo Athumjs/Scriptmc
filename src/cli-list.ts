@@ -29,6 +29,10 @@ export const list: List[] = [
     flag: "-p",
   },
   {
+    name: "--template",
+    flag: "-t",
+  },
+  {
     name: "start",
   },
 ];

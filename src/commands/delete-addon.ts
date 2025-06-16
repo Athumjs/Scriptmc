@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { event } from "../event";
 
 export function delete_addon(nameB: string, nameR: string): void {
   const pathMine: string[] = getFolder(nameB, nameR);
@@ -13,7 +14,7 @@ export function delete_addon(nameB: string, nameR: string): void {
     recursive: true,
     force: true,
   });
-  console.log("\x1b[1;32mAddon deleted sucessfully.\x1b[0m");
+  event("sucess", "Addon deleted sucessfully.");
 }
 
 function getFolder(nameB: string, nameR: string): string[] {
