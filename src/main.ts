@@ -22,16 +22,22 @@ async function main(): Promise<void> {
   const arg: string = args.filter((value) => value !== "").join("");
   const pathMine: string[] = getFolder();
   if (arg.startsWith("-v") || arg.startsWith("--version")) {
-    console.log("\x1b[34mVersion: \x1b[0m1.0.6");
+    console.log("\x1b[34mVersion: \x1b[0m1.0.7");
   } else if (arg.startsWith("-h") || arg.startsWith("--help")) {
     message_help();
   } else if (arg.startsWith("-n") || arg.startsWith("--new")) {
     const { name, description } = await inquirer.prompt([
       {
-        type: "input",
+        type: "search",
         name: "name",
         message: "Addon name:",
-        required: true,
+        source: (term) => {
+          const addons: string[] = [];
+          if (term) addons.push(term);
+          return addons.filter(
+            (addon) => !fs.readdirSync(pathMine[0]).includes(addon)
+          );
+        },
       },
       {
         type: "input",
@@ -212,29 +218,12 @@ async function main(): Promise<void> {
           },
         },
         {
-          when: (data) => {
-            const behaviors: string[] = fs
-              .readdirSync(pathMine[0])
-              .filter((behavior) =>
-                fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
-              );
-            const resources: string[] = fs
-              .readdirSync(pathMine[1])
-              .filter((resource) =>
-                fs.existsSync(path.join(pathMine[0], resource, "manifest.json"))
-              );
-            if (behaviors.length <= 0 || resources.length <= 0) {
-              event("error", "No addons found.");
-              return false;
-            }
-            return data.addon;
-          },
           type: "input",
           name: "namePack",
           message: "World compilated name:",
         },
       ]);
-      build_world(nameW, nameB, nameR, namePack || nameW);
+      build_world(nameW, nameB, nameR, namePack);
     }
   } else if (arg.startsWith("-d") || arg.startsWith("--delete")) {
     if (pathMine.length <= 0) {
