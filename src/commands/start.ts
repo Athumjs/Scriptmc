@@ -3,9 +3,12 @@ import chokidar from "chokidar";
 import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
+import inquirer from "inquirer";
+import colors from "yoctocolors-cjs";
+import { event } from "../event";
 
-export function start(name: string): void {
-  const pathMine: string = getFolder(name);
+export async function start(name: string): Promise<void> {
+  const pathMine: string = await getFolder(name);
   if (!pathMine) return;
   const watcher = chokidar.watch(path.join(pathMine, "scriptmc"), {
     ignoreInitial: true,
@@ -20,23 +23,36 @@ export function start(name: string): void {
       format: "esm",
     });
     console.clear();
-    console.log(
-      `\x1b[1;32mTranspiled \x1b[3;33m${path.basename(
-        pathFile
-      )}\x1b[1;32m file\x1b[0m`
+    event(
+      "sucess",
+      `Transpiled ${colors.blue(colors.italic(path.basename(pathFile)))} file`
     );
   });
 
-  console.log(
-    `\x1b[1;32mTranspilation enabled (edit \x1b[3;33m${path.join(
-      pathMine,
-      "scripts",
-      "main.ts"
-    )}\x1b[1;32m file)\x1b[0m`
+  watcher.on("unlink", (pathFile) => {
+    build({
+      entryPoints: [path.join(pathMine, "scriptmc/**/*.ts")],
+      outdir: path.join(pathMine, "scripts"),
+      platform: "node",
+      target: "esnext",
+      format: "esm",
+    });
+    console.clear();
+    event(
+      "sucess",
+      `Remove ${colors.blue(colors.italic(path.basename(pathFile)))} file`
+    );
+  });
+
+  event(
+    "sucess",
+    `Transpilation enabled (edit ${colors.blue(
+      colors.italic(path.join(pathMine, "scriptmc", "main.ts"))
+    )} file)`
   );
 }
 
-function getFolder(name: string): string {
+async function getFolder(name: string): Promise<string> {
   const pathMine: string = fs.readFileSync(
     path.join(__dirname, "../../path.config"),
     "utf-8"
@@ -53,7 +69,48 @@ function getFolder(name: string): string {
       )
     )
   ) {
-    console.log(`\x1b[1;31mTypescript not found: ${name}\x1b[0m`);
+    event("error", `Typescript not found: ${name}`);
+    const { create } = await inquirer.prompt([
+      {
+        type: "confirm",
+        name: "create",
+        message: "Do create typescript in this addon?",
+      },
+    ]);
+    if (create) {
+      if (
+        !fs.existsSync(
+          path.join(
+            os.homedir(),
+            pathMine,
+            "development_behavior_packs",
+            name,
+            "scriptmc"
+          )
+        )
+      )
+        fs.mkdirSync(
+          path.join(
+            os.homedir(),
+            pathMine,
+            "development_behavior_packs",
+            name,
+            "scriptmc"
+          )
+        );
+      fs.writeFileSync(
+        path.join(
+          os.homedir(),
+          pathMine,
+          "development_behavior_packs",
+          name,
+          "scriptmc",
+          "main.ts"
+        ),
+        ""
+      );
+      event("sucess", `Typescript added for the addon: ${name}`);
+    }
     return "";
   }
   return path.join(os.homedir(), pathMine, "development_behavior_packs", name);

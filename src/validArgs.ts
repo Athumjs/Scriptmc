@@ -1,11 +1,7 @@
 import { list } from "./cli-list.js";
+import { event } from "./event.js";
 
-interface ValidArgs {
-  event: "sucess" | "error";
-  value: string | string[];
-}
-
-function validArgs(): ValidArgs {
+function validArgs(): string[] {
   const args_cli: string[] = process.argv.slice(2);
   const args_valid: string[] = [];
   let arg_error: string = "";
@@ -23,13 +19,11 @@ function validArgs(): ValidArgs {
   }
 
   if (args_cli.length !== args_valid.filter((value) => value !== "").length) {
-    return {
-      event: "error",
-      value: `Invalid argument not expected: ${arg_error}`,
-    };
+    event("error", `Invalid argument not expected: ${arg_error}`);
+    return [];
   }
 
-  return { event: "sucess", value: args_valid };
+  return args_valid;
 }
 
 export { validArgs };

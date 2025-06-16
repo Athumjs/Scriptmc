@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { v4 as uuidv4 } from "uuid";
+import { event } from "../event";
 
 export function new_addon(
   name: string,
@@ -92,13 +93,15 @@ export function new_addon(
       `${pathMine[0]}/${
         language.includes("Typescript") ? "scriptmc/main.ts" : "scripts/main.js"
       }`,
-      `import { world } from "@minecraft/server"\n\nworld.afterEvents.itemUse.subscribe((data) => {
+      language.includes("empty")
+        ? ""
+        : `import { world } from "@minecraft/server"\n\nworld.afterEvents.itemUse.subscribe((data) => {
   const { source, itemStack } = data;
   world.sendMessage(\`\${source.name} used item \${itemStack?.typeId}\`);
 })`
     );
   }
-  console.log(`\x1b[1;32mAddon created successfully: ${name}\x1b[0m`);
+  event("sucess", `Addon created successfully: ${name}`);
 }
 
 function getFolder(name: string): string[] {
@@ -109,12 +112,12 @@ function getFolder(name: string): string[] {
   if (
     fs.existsSync(
       path.join(os.homedir(), pathMine, "development_behavior_packs", name)
-    ) &&
+    ) ||
     fs.existsSync(
       path.join(os.homedir(), pathMine, "development_resource_packs", name)
     )
   ) {
-    console.log(`\x1b[1;31mAddon already exists: ${name}\x1b[0m`);
+    event("error", `Addon already exists: ${name}`);
     return [];
   }
   if (
