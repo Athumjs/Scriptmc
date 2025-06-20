@@ -110,17 +110,6 @@ function getFolder(name: string): string[] {
     "utf-8"
   );
   if (
-    fs.existsSync(
-      path.join(os.homedir(), pathMine, "development_behavior_packs", name)
-    ) ||
-    fs.existsSync(
-      path.join(os.homedir(), pathMine, "development_resource_packs", name)
-    )
-  ) {
-    event("error", `Addon already exists: ${name}`);
-    return [];
-  }
-  if (
     !fs.existsSync(
       path.join(os.homedir(), pathMine, "development_behavior_packs")
     )

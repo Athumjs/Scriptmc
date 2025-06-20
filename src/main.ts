@@ -20,9 +20,9 @@ async function main(): Promise<void> {
   if (validArgs().length <= 0) return;
   const args: string[] = validArgs() as string[];
   const arg: string = args.filter((value) => value !== "").join("");
-  const pathMine: string[] = getFolder();
+  const pathMine: string[] = await getFolder();
   if (arg.startsWith("-v") || arg.startsWith("--version")) {
-    console.log("\x1b[34mVersion: \x1b[0m1.0.7");
+    console.log("\x1b[34mVersion: \x1b[0m1.0.8");
   } else if (arg.startsWith("-h") || arg.startsWith("--help")) {
     message_help();
   } else if (arg.startsWith("-n") || arg.startsWith("--new")) {
@@ -343,7 +343,7 @@ async function main(): Promise<void> {
   }
 }
 
-function getFolder(): string[] {
+async function getFolder(): Promise<string[]> {
   const pathMine: string = fs.readFileSync(
     path.join(__dirname, "../path.config"),
     "utf-8"

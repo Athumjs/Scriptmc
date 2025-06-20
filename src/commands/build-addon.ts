@@ -33,7 +33,7 @@ export function build_addon(
     event(
       "sucess",
       `Addon construction completed. ${colors.blue(
-        colors.italic(path.join(pathMine[2], `${namePack}.mcworld`))
+        colors.italic(path.join(pathMine[2], `${namePack}.mcaddon`))
       )}`
     );
   });
