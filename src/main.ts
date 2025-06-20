@@ -34,9 +34,12 @@ async function main(): Promise<void> {
         source: (term) => {
           const addons: string[] = [];
           if (term) addons.push(term);
-          return addons.filter(
-            (addon) => !fs.readdirSync(pathMine[0]).includes(addon)
-          );
+          if (pathMine[0]) {
+            return addons.filter(
+              (addon) => !fs.readdirSync(pathMine[0])?.includes(addon)
+            );
+          }
+          return addons;
         },
       },
       {

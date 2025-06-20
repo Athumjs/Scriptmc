@@ -19,16 +19,38 @@ export function build_addon(
   });
 
   output.on("close", () => {
+    if (fs.existsSync(path.join(pathMine[0], `../scriptmc-backup-${nameB}`))) {
+      fs.cpSync(
+        path.join(pathMine[0], `../scriptmc-backup-${nameB}`),
+        path.join(pathMine[0], "scriptmc"),
+        { recursive: true }
+      );
+      fs.rmSync(path.join(pathMine[0], `../scriptmc-backup-${nameB}`), {
+        recursive: true,
+        force: true,
+      });
+    }
     event(
       "sucess",
       `Addon construction completed. ${colors.blue(
-        colors.italic(path.join(pathMine[3], `${namePack}.mcworld`))
+        colors.italic(path.join(pathMine[2], `${namePack}.mcworld`))
       )}`
     );
   });
 
   archive.pipe(output);
 
+  if (fs.existsSync(path.join(pathMine[0], "scriptmc"))) {
+    fs.cpSync(
+      path.join(pathMine[0], "scriptmc"),
+      path.join(pathMine[0], `../scriptmc-backup-${nameB}`),
+      { recursive: true }
+    );
+    fs.rmSync(path.join(pathMine[0], "scriptmc"), {
+      recursive: true,
+      force: true,
+    });
+  }
   archive.directory(`${pathMine[0]}/`, nameB);
   archive.directory(`${pathMine[1]}/`, nameR);
 
