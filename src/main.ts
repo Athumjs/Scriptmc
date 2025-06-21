@@ -22,7 +22,7 @@ async function main(): Promise<void> {
   const arg: string = args.filter((value) => value !== "").join("");
   const pathMine: string[] = await getFolder();
   if (arg.startsWith("-v") || arg.startsWith("--version")) {
-    console.log("\x1b[34mVersion: \x1b[0m1.0.8");
+    console.log("\x1b[34mVersion: \x1b[0m1.0.9");
   } else if (arg.startsWith("-h") || arg.startsWith("--help")) {
     message_help();
   } else if (arg.startsWith("-n") || arg.startsWith("--new")) {
@@ -90,7 +90,7 @@ async function main(): Promise<void> {
     const resources: string[] = fs
       .readdirSync(pathMine[1])
       .filter((resource) =>
-        fs.existsSync(path.join(pathMine[0], resource, "manifest.json"))
+        fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
       );
     if (behaviors.length <= 0 || resources.length <= 0) {
       event("error", "No addons found.");
@@ -176,7 +176,7 @@ async function main(): Promise<void> {
             const resources: string[] = fs
               .readdirSync(pathMine[1])
               .filter((resource) =>
-                fs.existsSync(path.join(pathMine[0], resource, "manifest.json"))
+                fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
               );
             if (behaviors.length <= 0 || resources.length <= 0) {
               event("error", "No addons found.");
@@ -203,7 +203,7 @@ async function main(): Promise<void> {
             const resources: string[] = fs
               .readdirSync(pathMine[1])
               .filter((resource) =>
-                fs.existsSync(path.join(pathMine[0], resource, "manifest.json"))
+                fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
               );
             if (behaviors.length <= 0 || resources.length <= 0) {
               event("error", "No addons found.");
@@ -241,7 +241,7 @@ async function main(): Promise<void> {
     const resources: string[] = fs
       .readdirSync(pathMine[1])
       .filter((resource) =>
-        fs.existsSync(path.join(pathMine[0], resource, "manifest.json"))
+        fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
       );
     if (behaviors.length <= 0 || resources.length <= 0) {
       event("error", "No addons found.");

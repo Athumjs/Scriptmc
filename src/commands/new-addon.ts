@@ -21,17 +21,17 @@ export function new_addon(
     "description": "${description}",
     "uuid": "${behavior_uuid}",
     "version": [1, 0, 0],
-    "min_engine_version": [1, 21, 20]
+    "min_engine_version": [1, 21, 90]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "${uuidv4()}",
       "version": [1, 0, 0]
-    },
+    }
     ${
       script
-        ? `{
+        ? `,{
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
@@ -48,11 +48,11 @@ export function new_addon(
     },
     {
       "module_name": "@minecraft/server",
-      "version": "1.19.0"
+      "version": "2.0.0"
     },
     {
       "module_name": "@minecraft/server-ui",
-      "version": "1.3.0"
+      "version": "2.0.0"
     }
   ]
 }
