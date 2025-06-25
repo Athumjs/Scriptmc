@@ -38,10 +38,10 @@ export async function start(name: string): Promise<void> {
 }
 
 async function getFolder(name: string): Promise<string> {
-  const pathMine: string = fs.readFileSync(
-    path.join(__dirname, "../../path.config"),
-    "utf-8"
-  );
+  const pathMine: string = fs
+    .readFileSync(path.join(__dirname, "../../configs/path.config"), "utf-8")
+    .match(/\$mojang:.*\$/)![0]
+    .replace(/\$mojang:\s(.*)\$/, "$1");
   if (
     !fs.existsSync(
       path.join(

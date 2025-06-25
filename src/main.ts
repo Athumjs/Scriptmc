@@ -5,7 +5,6 @@ import { validArgs } from "./validArgs.js";
 import { new_addon } from "./commands/new-addon.js";
 import { delete_addon } from "./commands/delete-addon.js";
 import { build_addon } from "./commands/build-addon.js";
-import { path_config } from "./commands/path-config.js";
 import { template } from "./commands/template.js";
 import inquirer from "inquirer";
 import { start } from "./commands/start.js";
@@ -15,6 +14,7 @@ import path from "node:path";
 import os from "node:os";
 import { build_world } from "./commands/build-world.js";
 import { event } from "./event.js";
+import { Settings } from "./commands/settings.js";
 
 async function main(): Promise<void> {
   if (validArgs().length <= 0) return;
@@ -68,7 +68,7 @@ async function main(): Promise<void> {
         ],
         theme: {
           icon: {
-            cursor: "-→",
+            cursor: "–→",
           },
           style: {
             highlight: (text: string) => colors.bold(` ${text}`),
@@ -104,7 +104,7 @@ async function main(): Promise<void> {
         choices: [colors.yellow("Addon"), colors.red("World")],
         theme: {
           icon: {
-            cursor: "-→",
+            cursor: "–→",
           },
           style: {
             highlight: (text: string) => colors.bold(` ${text}`),
@@ -266,16 +266,68 @@ async function main(): Promise<void> {
       },
     ]);
     delete_addon(nameB, nameR);
-  } else if (arg.startsWith("-p") || arg.startsWith("--path")) {
-    const { path } = await inquirer.prompt([
+  } else if (arg.startsWith("-s") || arg.startsWith("--settings")) {
+    const { setting } = await inquirer.prompt([
       {
-        type: "input",
-        name: "path",
-        message: "Path:",
-        required: true,
+        type: "list",
+        name: "setting",
+        message: "Settings:",
+        choices: [colors.green("Paths"), colors.red("Manifest Json")],
+        theme: {
+          icon: {
+            cursor: "–→",
+          },
+          style: {
+            highlight: (text: string) => colors.bold(` ${text}`),
+          },
+        },
       },
     ]);
-    path_config(path);
+    if (setting.includes("Paths")) {
+      const { pathName } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "pathName",
+          message: "Change Path:",
+          choices: [
+            colors.green(`Minecraft ${colors.gray("(com.mojang)")}`),
+            colors.red("Exports Folder Path"),
+            colors.cyan("Exports Folder Name"),
+          ],
+          theme: {
+            icon: {
+              cursor: "–→",
+            },
+            style: {
+              highlight: (text: string) => colors.bold(` ${text}`),
+            },
+          },
+        },
+      ]);
+      new Settings().Paths(pathName);
+    } else {
+      const { manifestOption } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "manifestOption",
+          message: "Change Manifest Option:",
+          choices: [
+            colors.green("min_engine_version"),
+            colors.red("@minecraft/server version"),
+            colors.cyan("@minecraft/server-ui version"),
+          ],
+          theme: {
+            icon: {
+              cursor: "–→",
+            },
+            style: {
+              highlight: (text: string) => colors.bold(` ${text}`),
+            },
+          },
+        },
+      ]);
+      new Settings().Manifest(manifestOption);
+    }
   } else if (arg.startsWith("-t") || arg.startsWith("--template")) {
     if (pathMine.length <= 0) {
       event("error", "No addons found.");
@@ -302,7 +354,7 @@ async function main(): Promise<void> {
         ],
         theme: {
           icon: {
-            cursor: "-→",
+            cursor: "–→",
           },
           style: {
             highlight: (text: string) => colors.bold(` ${text}`),
@@ -344,10 +396,10 @@ async function main(): Promise<void> {
 }
 
 async function getFolder(): Promise<string[]> {
-  const pathMine: string = fs.readFileSync(
-    path.join(__dirname, "../path.config"),
-    "utf-8"
-  );
+  const pathMine: string = fs
+    .readFileSync(path.join(__dirname, "../configs/path.config"), "utf-8")
+    .match(/\$mojang:.*\$/)![0]
+    .replace(/\$mojang:\s(.*)\$/, "$1");
   let pathWorld: string = "";
   if (
     fs.readdirSync(

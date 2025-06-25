@@ -60,23 +60,25 @@ export function build_addon(
 }
 
 function getFolder(nameB: string, nameR: string): string[] {
-  const pathMine: string = fs.readFileSync(
-    path.join(__dirname, "../../path.config"),
-    "utf-8"
-  );
-  if (!fs.existsSync(path.join(os.homedir(), pathMine, "scriptmc-exports")))
-    fs.mkdirSync(path.join(os.homedir(), pathMine, "scriptmc-exports"));
-  if (
-    !fs.existsSync(
-      path.join(os.homedir(), pathMine, "scriptmc-exports", "addons")
-    )
-  )
-    fs.mkdirSync(
-      path.join(os.homedir(), pathMine, "scriptmc-exports", "addons")
-    );
+  const pathMine: string = fs
+    .readFileSync(path.join(__dirname, "../../configs/path.config"), "utf-8")
+    .match(/\$mojang:.*\$/)![0]
+    .replace(/\$mojang:\s(.*)\$/, "$1");
+  const folderPath: string = fs
+    .readFileSync(path.join(__dirname, "../../configs/path.config"), "utf-8")
+    .match(/\$exportsPath:.*\$/)![0]
+    .replace(/\$exportsPath:\s(.*)\$/, "$1");
+  const folderName: string = fs
+    .readFileSync(path.join(__dirname, "../../configs/path.config"), "utf-8")
+    .match(/\$exportsName:.*\$/)![0]
+    .replace(/\$exportsName:\s(.*)\$/, "$1");
+  if (!fs.existsSync(path.join(os.homedir(), folderPath, folderName)))
+    fs.mkdirSync(path.join(os.homedir(), folderPath, folderName));
+  if (!fs.existsSync(path.join(os.homedir(), folderPath, folderName, "addons")))
+    fs.mkdirSync(path.join(os.homedir(), folderPath, folderName, "addons"));
   return [
     path.join(os.homedir(), pathMine, "development_behavior_packs", nameB),
     path.join(os.homedir(), pathMine, "development_resource_packs", nameR),
-    path.join(os.homedir(), pathMine, "scriptmc-exports", "addons"),
+    path.join(os.homedir(), folderPath, folderName, "addons"),
   ];
 }

@@ -8,7 +8,7 @@ export function message_help(): void {
   console.log(" →" + " --new (-n) - create new addon.");
   console.log(" →" + " --build (-b) - build addon.");
   console.log(" →" + " --delete (-d) - delete a addon.");
-  console.log(" →" + " --path (-p) - change minecraft folder path.");
+  console.log(" →" + " --settings (-s) - smc settings.");
   console.log(
     " →" + " --template (-t) - create a template for items, blocks or entities"
   );

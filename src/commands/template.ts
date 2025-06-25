@@ -79,9 +79,9 @@ export function template(
 }
 
 function getFolder(name: string): string {
-  const pathMine: string = fs.readFileSync(
-    path.join(__dirname, "../../path.config"),
-    "utf-8"
-  );
+  const pathMine: string = fs
+    .readFileSync(path.join(__dirname, "../../configs/path.config"), "utf-8")
+    .match(/\$mojang:.*\$/)![0]
+    .replace(/\$mojang:\s(.*)\$/, "$1");
   return path.join(os.homedir(), pathMine, "development_behavior_packs", name);
 }

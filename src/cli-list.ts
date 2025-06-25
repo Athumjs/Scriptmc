@@ -25,8 +25,8 @@ export const list: List[] = [
     flag: "-d",
   },
   {
-    name: "--path",
-    flag: "-p",
+    name: "--settings",
+    flag: "-s",
   },
   {
     name: "--template",

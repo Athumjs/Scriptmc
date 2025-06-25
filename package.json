@@ -8,7 +8,7 @@
   "files": [
     "dist",
     "README.md",
-    "path.config",
+    "configs",
     "LICENSE",
     "package.json"
   ],

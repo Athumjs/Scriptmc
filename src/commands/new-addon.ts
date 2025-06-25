@@ -14,6 +14,7 @@ export function new_addon(
   if (pathMine.length <= 0) return;
   const behavior_uuid: string = uuidv4();
   const resource_uuid: string = uuidv4();
+  const pathMinefest: string[] = getManifestInfo();
   const behavior_manifest: string = `{
   "format_version": 2,
   "header": {
@@ -21,7 +22,7 @@ export function new_addon(
     "description": "${description}",
     "uuid": "${behavior_uuid}",
     "version": [1, 0, 0],
-    "min_engine_version": [1, 21, 90]
+    "min_engine_version": ${pathMinefest[0]}
   },
   "modules": [
     {
@@ -48,11 +49,11 @@ export function new_addon(
     },
     {
       "module_name": "@minecraft/server",
-      "version": "2.0.0"
+      "version": "${pathMinefest[1]}"
     },
     {
       "module_name": "@minecraft/server-ui",
-      "version": "2.0.0"
+      "version": "${pathMinefest[2]}"
     }
   ]
 }
@@ -64,7 +65,7 @@ export function new_addon(
     "description": "${description}",
     "uuid": "${resource_uuid}",
     "version": [1, 0, 0],
-    "min_engine_version": [1, 21, 20]
+    "min_engine_version": ${pathMinefest[0]}
   },
   "modules": [
     {
@@ -105,10 +106,10 @@ export function new_addon(
 }
 
 function getFolder(name: string): string[] {
-  const pathMine: string = fs.readFileSync(
-    path.join(__dirname, "../../path.config"),
-    "utf-8"
-  );
+  const pathMine: string = fs
+    .readFileSync(path.join(__dirname, "../../configs/path.config"), "utf-8")
+    .match(/\$mojang:.*\$/)![0]
+    .replace(/\$mojang:\s(.*)\$/, "$1");
   if (
     !fs.existsSync(
       path.join(os.homedir(), pathMine, "development_behavior_packs")
@@ -135,4 +136,29 @@ function getFolder(name: string): string[] {
     path.join(os.homedir(), pathMine, "development_behavior_packs", name),
     path.join(os.homedir(), pathMine, "development_resource_packs", name),
   ];
+}
+
+function getManifestInfo(): string[] {
+  const min_version: string = fs
+    .readFileSync(
+      path.join(__dirname, "../../configs/manifest.config"),
+      "utf-8"
+    )
+    .match(/\$min_engine_version:.*\$/)![0]
+    .replace(/\$min_engine_version:\s(.*)\$/, "$1");
+  const minecraft_server: string = fs
+    .readFileSync(
+      path.join(__dirname, "../../configs/manifest.config"),
+      "utf-8"
+    )
+    .match(/\$@minecraft\/server:.*\$/)![0]
+    .replace(/\$@minecraft\/server:\s(.*)\$/, "$1");
+  const minecraft_server_ui: string = fs
+    .readFileSync(
+      path.join(__dirname, "../../configs/manifest.config"),
+      "utf-8"
+    )
+    .match(/\$@minecraft\/server-ui:.*\$/)![0]
+    .replace(/\$@minecraft\/server-ui:\s(.*)\$/, "$1");
+  return [min_version, minecraft_server, minecraft_server_ui];
 }
