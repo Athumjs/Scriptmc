@@ -4,6 +4,8 @@ import path from "node:path";
 import os from "node:os";
 import { event } from "../event";
 import colors from "yoctocolors-cjs";
+import { Beh } from "./b-a/beh";
+import { Reh } from "./b-a/reh";
 
 export function build_world(
   nameW: string,
@@ -20,6 +22,14 @@ export function build_world(
   });
   output.on("close", () => {
     if (nameB && nameR) {
+      fs.rmSync(path.join(pathMine[0], `../smc-backup-${nameB}`), {
+        recursive: true,
+        force: true,
+      });
+      fs.rmSync(path.join(pathMine[1], `../smc-backup-${nameR}`), {
+        recursive: true,
+        force: true,
+      });
       fs.rmSync(path.join(pathMine[2], "behavior_packs", nameB), {
         recursive: true,
         force: true,
@@ -39,12 +49,22 @@ export function build_world(
 
   archive.pipe(output);
   if (nameB && nameR) {
-    fs.cpSync(pathMine[0], path.join(pathMine[2], "behavior_packs", nameB), {
-      recursive: true,
-    });
-    fs.cpSync(pathMine[1], path.join(pathMine[2], "resource_packs", nameR), {
-      recursive: true,
-    });
+    Beh(pathMine[0], nameB);
+    Reh(pathMine[1], nameR);
+    fs.cpSync(
+      path.join(pathMine[0], `../smc-backup-${nameB}`),
+      path.join(pathMine[2], "behavior_packs", nameB),
+      {
+        recursive: true,
+      }
+    );
+    fs.cpSync(
+      path.join(pathMine[1], `../smc-backup-${nameR}`),
+      path.join(pathMine[2], "resource_packs", nameR),
+      {
+        recursive: true,
+      }
+    );
   }
   archive.directory(`${pathMine[2]}/`, false);
   archive.finalize();

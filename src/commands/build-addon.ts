@@ -4,6 +4,8 @@ import path from "node:path";
 import os from "node:os";
 import { event } from "../event";
 import colors from "yoctocolors-cjs";
+import { Beh } from "./b-a/beh";
+import { Reh } from "./b-a/reh";
 
 export function build_addon(
   nameB: string,
@@ -19,17 +21,14 @@ export function build_addon(
   });
 
   output.on("close", () => {
-    if (fs.existsSync(path.join(pathMine[0], `../scriptmc-backup-${nameB}`))) {
-      fs.cpSync(
-        path.join(pathMine[0], `../scriptmc-backup-${nameB}`),
-        path.join(pathMine[0], "scriptmc"),
-        { recursive: true }
-      );
-      fs.rmSync(path.join(pathMine[0], `../scriptmc-backup-${nameB}`), {
-        recursive: true,
-        force: true,
-      });
-    }
+    fs.rmSync(path.join(pathMine[0], `../smc-backup-${nameB}`), {
+      force: true,
+      recursive: true,
+    });
+    fs.rmSync(path.join(pathMine[1], `../smc-backup-${nameR}`), {
+      force: true,
+      recursive: true,
+    });
     event(
       "sucess",
       `Addon construction completed. ${colors.blue(
@@ -40,19 +39,22 @@ export function build_addon(
 
   archive.pipe(output);
 
-  if (fs.existsSync(path.join(pathMine[0], "scriptmc"))) {
-    fs.cpSync(
-      path.join(pathMine[0], "scriptmc"),
-      path.join(pathMine[0], `../scriptmc-backup-${nameB}`),
-      { recursive: true }
+  Beh(pathMine[0], nameB);
+  Reh(pathMine[1], nameR);
+
+  if (nameB === nameR) {
+    archive.directory(
+      path.join(pathMine[0], `../smc-backup-${nameB}`),
+      `${nameB} B`
     );
-    fs.rmSync(path.join(pathMine[0], "scriptmc"), {
-      recursive: true,
-      force: true,
-    });
+    archive.directory(
+      path.join(pathMine[1], `../smc-backup-${nameR}`),
+      `${nameR} R`
+    );
+  } else {
+    archive.directory(path.join(pathMine[0], `../smc-backup-${nameB}`), nameB);
+    archive.directory(path.join(pathMine[1], `../smc-backup-${nameR}`), nameR);
   }
-  archive.directory(`${pathMine[0]}/`, nameB);
-  archive.directory(`${pathMine[1]}/`, nameR);
 
   archive.finalize();
 }

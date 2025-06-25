@@ -14,7 +14,7 @@ export async function start(name: string): Promise<void> {
     ignoreInitial: true,
   });
 
-  watcher.on("change", (pathFile) => {
+  watcher.on("all", (eventFile, pathFile) => {
     build({
       entryPoints: [path.join(pathMine, "scriptmc/**/*.ts")],
       outdir: path.join(pathMine, "scripts"),
@@ -25,22 +25,7 @@ export async function start(name: string): Promise<void> {
     console.clear();
     event(
       "sucess",
-      `Transpiled ${colors.blue(colors.italic(path.basename(pathFile)))} file`
-    );
-  });
-
-  watcher.on("unlink", (pathFile) => {
-    build({
-      entryPoints: [path.join(pathMine, "scriptmc/**/*.ts")],
-      outdir: path.join(pathMine, "scripts"),
-      platform: "node",
-      target: "esnext",
-      format: "esm",
-    });
-    console.clear();
-    event(
-      "sucess",
-      `Remove ${colors.blue(colors.italic(path.basename(pathFile)))} file`
+      `${eventFile} ${colors.blue(colors.italic(path.basename(pathFile)))} file`
     );
   });
 
