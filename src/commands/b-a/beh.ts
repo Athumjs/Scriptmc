@@ -50,5 +50,13 @@ export function Beh(pathMine: string, name: string) {
       if (!folder) return;
       beh.push(folder);
     });
+    beh.forEach((item) => {
+      if (!fs.existsSync(path.join(pathMine, item))) return;
+      fs.cpSync(
+        path.join(pathMine, item),
+        path.join(pathMine, `../smc-backup-${name}`, item),
+        { recursive: true }
+      );
+    });
   }
 }
