@@ -15,6 +15,8 @@ const paths: {
         type: "input",
         name: "pathMine",
         message: "Minecraft (com.mojang) Path:",
+        default:
+          "AppData/Local/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang",
         required: true,
       },
     ]);
@@ -70,6 +72,9 @@ const paths: {
         type: "input",
         name: "pathFolder",
         message: "Exports Folder Path:",
+        default:
+          "AppData/Local/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang",
+        required: true,
       },
     ]);
     if (pathFolder.includes(os.homedir())) {
@@ -126,6 +131,7 @@ const paths: {
         type: "input",
         name: "nameFolder",
         message: "Exports Folder Name:",
+        default: "scriptmc-exports",
         required: true,
       },
     ]);

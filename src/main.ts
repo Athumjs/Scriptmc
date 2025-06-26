@@ -22,7 +22,7 @@ async function main(): Promise<void> {
   const arg: string = args.filter((value) => value !== "").join("");
   const pathMine: string[] = await getFolder();
   if (arg.startsWith("-v") || arg.startsWith("--version")) {
-    console.log("\x1b[34mVersion: \x1b[0m1.1.4");
+    console.log("\x1b[34mVersion: \x1b[0m1.1.5");
   } else if (arg.startsWith("-h") || arg.startsWith("--help")) {
     message_help();
   } else if (arg.startsWith("-n") || arg.startsWith("--new")) {
@@ -119,16 +119,9 @@ async function main(): Promise<void> {
           name: "nameB",
           message: "Behavior name:",
           source: (term) => {
-            if (!term) return behaviors;
-            let behavior: string[] = [];
-            term!.split("").forEach((word) => {
-              behavior = behaviors.filter(
-                (value) =>
-                  value.includes(word.toLowerCase()) ||
-                  value.includes(word.toUpperCase())
-              );
-            });
-            return behavior;
+            return behaviors.filter((behavior) =>
+              behavior.toLowerCase().includes(term?.toLowerCase() || "")
+            );
           },
         },
         {
@@ -136,16 +129,9 @@ async function main(): Promise<void> {
           name: "nameR",
           message: "Resource name:",
           source: (term) => {
-            if (!term) return resources;
-            let resource: string[] = [];
-            term!.split("").forEach((word) => {
-              resource = resources.filter(
-                (value) =>
-                  value.includes(word.toLowerCase()) ||
-                  value.includes(word.toUpperCase())
-              );
-            });
-            return resource;
+            return resources.filter((resource) =>
+              resource.toLowerCase().includes(term?.toLowerCase() || "")
+            );
           },
         },
         {
@@ -177,16 +163,9 @@ async function main(): Promise<void> {
           name: "nameW",
           message: "World name:",
           source: (term) => {
-            if (!term) return worlds;
-            let world: string[] = [];
-            term!.split("").forEach((word) => {
-              world = worlds.filter(
-                (value) =>
-                  value.includes(word.toLowerCase()) ||
-                  value.includes(word.toUpperCase())
-              );
-            });
-            return world;
+            return worlds.filter((world) =>
+              world.toLowerCase().includes(term?.toLowerCase() || "")
+            );
           },
         },
         {
@@ -211,16 +190,9 @@ async function main(): Promise<void> {
           name: "nameB",
           message: "Behavior name:",
           source: (term) => {
-            if (!term) return behaviors;
-            let behavior: string[] = [];
-            term!.split("").forEach((word) => {
-              behavior = behaviors.filter(
-                (value) =>
-                  value.includes(word.toLowerCase()) ||
-                  value.includes(word.toUpperCase())
-              );
-            });
-            return behavior;
+            return behaviors.filter((behavior) =>
+              behavior.toLowerCase().includes(term?.toLowerCase() || "")
+            );
           },
         },
         {
@@ -245,16 +217,9 @@ async function main(): Promise<void> {
           name: "nameR",
           message: "Resource name:",
           source: (term) => {
-            if (!term) return resources;
-            let resource: string[] = [];
-            term!.split("").forEach((word) => {
-              resource = resources.filter(
-                (value) =>
-                  value.includes(word.toLowerCase()) ||
-                  value.includes(word.toUpperCase())
-              );
-            });
-            return resource;
+            return resources.filter((resource) =>
+              resource.toLowerCase().includes(term?.toLowerCase() || "")
+            );
           },
         },
         {
@@ -290,16 +255,9 @@ async function main(): Promise<void> {
         name: "nameB",
         message: "Behavior name:",
         source: (term) => {
-          if (!term) return behaviors;
-          let behavior: string[] = [];
-          term!.split("").forEach((word) => {
-            behavior = behaviors.filter(
-              (value) =>
-                value.includes(word.toLowerCase()) ||
-                value.includes(word.toUpperCase())
-            );
-          });
-          return behavior;
+          return behaviors.filter((behavior) =>
+            behavior.toLowerCase().includes(term?.toLowerCase() || "")
+          );
         },
       },
       {
@@ -307,16 +265,9 @@ async function main(): Promise<void> {
         name: "nameR",
         message: "Resource name:",
         source: (term) => {
-          if (!term) return resources;
-          let resource: string[] = [];
-          term!.split("").forEach((word) => {
-            resource = resources.filter(
-              (value) =>
-                value.includes(word.toLowerCase()) ||
-                value.includes(word.toUpperCase())
-            );
-          });
-          return resource;
+          return resources.filter((resource) =>
+            resource.toLowerCase().includes(term?.toLowerCase() || "")
+          );
         },
       },
     ]);
@@ -448,7 +399,9 @@ async function main(): Promise<void> {
         name: "name",
         message: "Behavior name:",
         source: (term) => {
-          return behaviors.filter((behavior) => behavior.includes(term || ""));
+          return behaviors.filter((behavior) =>
+            behavior.toLowerCase().includes(term?.toLowerCase() || "")
+          );
         },
       },
     ]);
@@ -469,7 +422,9 @@ async function main(): Promise<void> {
         name: "name",
         message: "Behavior name:",
         source: (term) => {
-          return behaviors.filter((behavior) => behavior.includes(term || ""));
+          return behaviors.filter((behavior) =>
+            behavior.toLowerCase().includes(term?.toLowerCase() || "")
+          );
         },
       },
     ]);
