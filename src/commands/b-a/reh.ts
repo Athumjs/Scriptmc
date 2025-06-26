@@ -1,30 +1,29 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const reh: string[] = [
-  "manifest.json",
-  "animation_controllers",
-  "animations",
-  "attachables",
-  "block_culling",
-  "entity",
-  "fogs",
-  "items",
-  "materials",
-  "models",
-  "particles",
-  "render_controllers",
-  "sounds",
-  "texts",
-  "textures",
-  "ui",
-  "blocks.json",
-  "manifest.json",
-  "pack_icon.png",
-  "sounds.json",
-];
-
 export function Reh(pathMine: string, name: string) {
+  const reh: string[] = [
+    "manifest.json",
+    "animation_controllers",
+    "animations",
+    "attachables",
+    "block_culling",
+    "entity",
+    "fogs",
+    "items",
+    "materials",
+    "models",
+    "particles",
+    "render_controllers",
+    "sounds",
+    "texts",
+    "textures",
+    "ui",
+    "blocks.json",
+    "manifest.json",
+    "pack_icon.png",
+    "sounds.json",
+  ];
   const buildOption: string = fs
     .readFileSync(
       path.join(__dirname, "../../../configs/build.config"),

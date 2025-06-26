@@ -1,30 +1,30 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const beh: string[] = [
-  "animation_controllers",
-  "animations",
-  "blocks",
-  "cameras",
-  "entities",
-  "features",
-  "features_rules",
-  "dialogue",
-  "functions",
-  "item_catalog",
-  "items",
-  "loot_table",
-  "recipes",
-  "spawn_rules",
-  "structures",
-  "texts",
-  "trading",
-  "scripts",
-  "manifest.json",
-  "pack_icon.png",
-];
-
 export function Beh(pathMine: string, name: string) {
+  const beh: string[] = [
+    "animation_controllers",
+    "animations",
+    "blocks",
+    "cameras",
+    "entities",
+    "features",
+    "feature_rules",
+    "dialogue",
+    "functions",
+    "item_catalog",
+    "items",
+    "loot_table",
+    "recipes",
+    "spawn_rules",
+    "structures",
+    "texts",
+    "trading",
+    "scripts",
+    "subpacks",
+    "manifest.json",
+    "pack_icon.png",
+  ];
   const buildOption: string = fs
     .readFileSync(
       path.join(__dirname, "../../../configs/build.config"),
