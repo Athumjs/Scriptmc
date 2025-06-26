@@ -15,6 +15,7 @@ const paths: {
         type: "input",
         name: "pathMine",
         message: "Minecraft (com.mojang) Path:",
+        required: true,
       },
     ]);
     if (pathMine.includes(os.homedir())) {
@@ -125,6 +126,7 @@ const paths: {
         type: "input",
         name: "nameFolder",
         message: "Exports Folder Name:",
+        required: true,
       },
     ]);
     fs.writeFileSync(
@@ -158,9 +160,11 @@ const manifestOptions: {
         type: "input",
         name: "version",
         message: "min_engine_version:",
+        default: "1.21.90",
+        required: true,
       },
     ]);
-    if (!version.match(/\[\d,\d{1,2},\d{1,2}\]/)) {
+    if (!version.match(/\d{1}\.\d{1,2}\.\d{1,2}/)) {
       event("error", "Value invalid.");
       return;
     }
@@ -178,7 +182,9 @@ const manifestOptions: {
               "utf-8"
             )
             .match(/\$min_engine_version:.*\$/)![0],
-          `$min_engine_version: ${version}$`
+          `$min_engine_version: [${version.split(".")[0]}, ${
+            version.split(".")[1]
+          }, ${version.split(".")[2]}]$`
         )
     );
   },
@@ -188,9 +194,11 @@ const manifestOptions: {
         type: "input",
         name: "version",
         message: "@minecraft/server version:",
+        default: "2.0.0",
+        required: true,
       },
     ]);
-    if (!version.match(/\d\.\d{1,2}\.\d/)) {
+    if (!version.match(/\d{1}\.\d{1,2}\.\d{1}/)) {
       event("error", "Value invalid.");
       return;
     }
@@ -218,9 +226,11 @@ const manifestOptions: {
         type: "input",
         name: "version",
         message: "@minecraft/server-ui version:",
+        default: "2.0.0",
+        required: true,
       },
     ]);
-    if (!version.match(/\d\.\d{1,2}\.\d/)) {
+    if (!version.match(/\d{1}\.\d{1,2}\.\d{1}/)) {
       event("error", "Value invalid.");
       return;
     }
@@ -244,6 +254,109 @@ const manifestOptions: {
   },
 };
 
+const buildOptions: {
+  essential: () => void;
+  specify: () => Promise<void>;
+  all: () => void;
+} = {
+  essential: () => {
+    fs.writeFileSync(
+      path.join(__dirname, "../../configs/build.config"),
+      fs
+        .readFileSync(
+          path.join(__dirname, "../../configs/build.config"),
+          "utf-8"
+        )
+        .replace(
+          fs
+            .readFileSync(
+              path.join(__dirname, "../../configs/build.config"),
+              "utf-8"
+            )
+            .match(/\$buildType:.*\$/)![0],
+          "$buildType: only essential$"
+        )
+    );
+  },
+  specify: async () => {
+    const { foldersB, foldersR } = await inquirer.prompt([
+      {
+        type: "input",
+        name: "foldersB",
+        message: "Folders behavior:",
+        default: "src, scriptmc or empty",
+      },
+      {
+        type: "input",
+        name: "foldersR",
+        message: "Folders resouce:",
+        default: "customui, customtester or empty",
+      },
+    ]);
+    if (
+      !foldersB.match(/^\w*(?:,\s*[\w]+)*$/u) ||
+      !foldersR.match(/^\w*(?:,\s*[\w]+)*$/u)
+    ) {
+      event("error", "Value invalid.");
+      return;
+    }
+    const folders: { beh: string[]; reh: string[] } = {
+      beh: [],
+      reh: [],
+    };
+    if (!foldersB.includes(",")) {
+      folders.beh.push(foldersB);
+    } else {
+      foldersB.split(",").forEach((folder: string) => {
+        folders.beh.push(folder);
+      });
+    }
+    if (!foldersR.includes(",")) {
+      folders.reh.push(foldersR);
+    } else {
+      foldersR.split(",").forEach((folder: string) => {
+        folders.reh.push(folder);
+      });
+    }
+    fs.writeFileSync(
+      path.join(__dirname, "../../configs/build.config"),
+      fs
+        .readFileSync(
+          path.join(__dirname, "../../configs/build.config"),
+          "utf-8"
+        )
+        .replace(
+          fs
+            .readFileSync(
+              path.join(__dirname, "../../configs/build.config"),
+              "utf-8"
+            )
+            .match(/\$buildType:.*\$/)![0],
+          `$buildType: ${JSON.stringify(folders)}$`
+        )
+    );
+  },
+  all: () => {
+    fs.writeFileSync(
+      path.join(__dirname, "../../configs/build.config"),
+      fs
+        .readFileSync(
+          path.join(__dirname, "../../configs/build.config"),
+          "utf-8"
+        )
+        .replace(
+          fs
+            .readFileSync(
+              path.join(__dirname, "../../configs/build.config"),
+              "utf-8"
+            )
+            .match(/\$buildType:.*\$/)![0],
+          "$buildType: all folders$"
+        )
+    );
+  },
+};
+
 export class Settings {
   Paths(pathName: string) {
     if (pathName.includes("Minecraft")) paths.minecraft();
@@ -256,5 +369,10 @@ export class Settings {
     else if (manifestOption.includes("@minecraft/server version"))
       manifestOptions.minecraft_server();
     else manifestOptions.minecraft_server_ui();
+  }
+  Build(buildOption: string) {
+    if (buildOption.includes("Only essential")) buildOptions.essential();
+    else if (buildOption.includes("Specify folder")) buildOptions.specify();
+    else buildOptions.all();
   }
 }

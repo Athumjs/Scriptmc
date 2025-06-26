@@ -22,7 +22,7 @@ async function main(): Promise<void> {
   const arg: string = args.filter((value) => value !== "").join("");
   const pathMine: string[] = await getFolder();
   if (arg.startsWith("-v") || arg.startsWith("--version")) {
-    console.log("\x1b[34mVersion: \x1b[0m1.1.0");
+    console.log("\x1b[34mVersion: \x1b[0m1.1.3");
   } else if (arg.startsWith("-h") || arg.startsWith("--help")) {
     message_help();
   } else if (arg.startsWith("-n") || arg.startsWith("--new")) {
@@ -272,7 +272,11 @@ async function main(): Promise<void> {
         type: "list",
         name: "setting",
         message: "Settings:",
-        choices: [colors.green("Paths"), colors.red("Manifest Json")],
+        choices: [
+          colors.green("Paths"),
+          colors.red("Manifest Json"),
+          colors.cyan("Build"),
+        ],
         theme: {
           icon: {
             cursor: "–→",
@@ -305,7 +309,7 @@ async function main(): Promise<void> {
         },
       ]);
       new Settings().Paths(pathName);
-    } else {
+    } else if (setting.includes("Manifest")) {
       const { manifestOption } = await inquirer.prompt([
         {
           type: "list",
@@ -327,6 +331,29 @@ async function main(): Promise<void> {
         },
       ]);
       new Settings().Manifest(manifestOption);
+    } else {
+      const { buildType } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "buildType",
+          message:
+            "Would you like to export the essential addon folders (like blocks, items and scripts)?",
+          choices: [
+            colors.green("Only essential"),
+            colors.red("Specify folder"),
+            colors.cyan("All folders"),
+          ],
+          theme: {
+            icon: {
+              cursor: "–→",
+            },
+            style: {
+              highlight: (text: string) => colors.bold(` ${text}`),
+            },
+          },
+        },
+      ]);
+      new Settings().Build(buildType);
     }
   } else if (arg.startsWith("-t") || arg.startsWith("--template")) {
     if (pathMine.length <= 0) {
