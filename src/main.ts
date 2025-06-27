@@ -345,7 +345,7 @@ async function main(): Promise<void> {
           message:
             "Would you like to export the essential addon folders (like blocks, items and scripts)?",
           choices: [
-            colors.green("Only essential"),
+            colors.green(`Only essential ${colors.gray("(recommended)")}`),
             colors.red("Specify folder"),
             colors.cyan("All folders"),
           ],
