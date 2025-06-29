@@ -264,6 +264,7 @@ const buildOptions: {
   essential: () => void;
   specify: () => Promise<void>;
   all: () => void;
+  name: (nameB: string, nameR: string) => void;
 } = {
   essential: () => {
     fs.writeFileSync(
@@ -361,6 +362,29 @@ const buildOptions: {
         )
     );
   },
+  name: (nameB, nameR) => {
+    if (!nameB.match(/[a-zA-Z_]+/) || !nameR.match(/[a-zA-Z_]+/)) {
+      event("error", "Value invalid.");
+      return;
+    }
+    fs.writeFileSync(
+      path.join(__dirname, "../../configs/build.config"),
+      fs
+        .readFileSync(
+          path.join(__dirname, "../../configs/build.config"),
+          "utf-8"
+        )
+        .replace(
+          fs
+            .readFileSync(
+              path.join(__dirname, "../../configs/build.config"),
+              "utf-8"
+            )
+            .match(/\$buildName:.*\$/)![0],
+          `$buildName: ["${nameB}", "${nameR}"]`
+        )
+    );
+  },
 };
 
 export class Settings {
@@ -376,9 +400,10 @@ export class Settings {
       manifestOptions.minecraft_server();
     else manifestOptions.minecraft_server_ui();
   }
-  Build(buildOption: string) {
+  Build(buildOption: string | string[]) {
     if (buildOption.includes("Only essential")) buildOptions.essential();
     else if (buildOption.includes("Specify folder")) buildOptions.specify();
-    else buildOptions.all();
+    else if (buildOption.includes("All folders")) buildOptions.all();
+    else buildOptions.name(buildOption[0], buildOption[1]);
   }
 }

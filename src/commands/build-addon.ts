@@ -16,6 +16,12 @@ export function build_addon(
   const output = fs.createWriteStream(
     path.join(pathMine[2], `${namePack}.mcaddon`)
   );
+  const buildName: string[] = JSON.parse(
+    fs
+      .readFileSync(path.join(__dirname, "../../configs/build.config"), "utf-8")
+      .match(/\$buildName:.*\$/)![0]
+      .replace(/\$buildName:\s(.*)\$/, "$1")
+  );
   const archive = archiver("zip", {
     zlib: { level: 9 },
   });
@@ -45,11 +51,11 @@ export function build_addon(
   if (nameB === nameR) {
     archive.directory(
       path.join(pathMine[0], `../smc-backup-${nameB}`),
-      `${nameB} B`
+      `${nameB} ${buildName[0]}`
     );
     archive.directory(
       path.join(pathMine[1], `../smc-backup-${nameR}`),
-      `${nameR} R`
+      `${nameR} ${buildName[1]}`
     );
   } else {
     archive.directory(path.join(pathMine[0], `../smc-backup-${nameB}`), nameB);

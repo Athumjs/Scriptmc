@@ -17,292 +17,328 @@ import { event } from "./event.js";
 import { Settings } from "./commands/settings.js";
 
 async function main(): Promise<void> {
-  if (validArgs().length <= 0) return;
-  const args: string[] = validArgs() as string[];
-  const arg: string = args.filter((value) => value !== "").join("");
-  const pathMine: string[] = await getFolder();
-  if (arg.startsWith("-v") || arg.startsWith("--version")) {
-    console.log("\x1b[34mVersion: \x1b[0m1.1.6");
-  } else if (arg.startsWith("-h") || arg.startsWith("--help")) {
-    message_help();
-  } else if (arg.startsWith("-n") || arg.startsWith("--new")) {
-    const { name, description } = await inquirer.prompt([
-      {
-        type: "search",
-        name: "name",
-        message: "Addon name:",
-        source: (term) => {
-          const addons: string[] = [];
-          if (term) addons.push(term);
-          if (pathMine[0]) {
-            return addons.filter(
-              (addon) => !fs.readdirSync(pathMine[0])?.includes(addon)
-            );
-          }
-          return addons;
-        },
-      },
-      {
-        type: "input",
-        name: "description",
-        message: "Addon description:",
-      },
-    ]);
-    const { script, language } = await inquirer.prompt([
-      {
-        type: "confirm",
-        name: "script",
-        message: "Script?",
-      },
-      {
-        default: "Javascript",
-        when: (data) => data.script === true,
-        type: "list",
-        name: "language",
-        message: "Language:",
-        choices: [
-          colors.cyan(`Typescript ${colors.black("(recomended)")}`),
-          colors.blueBright("Typescript empty"),
-          colors.yellow("Javascript"),
-          colors.redBright("Javascript empty"),
-        ],
-        theme: {
-          icon: {
-            cursor: "–→",
-          },
-          style: {
-            highlight: (text: string) => colors.bold(` ${text}`),
-          },
-        },
-      },
-    ]);
-    new_addon(name, description, script, language);
-  } else if (arg.startsWith("-b") || arg.startsWith("--build")) {
-    if (pathMine.length <= 0) {
-      event("error", "No addons found.");
-      return;
-    }
-    const behaviors: string[] = fs
-      .readdirSync(pathMine[0])
-      .filter((behavior) =>
-        fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
-      );
-    const resources: string[] = fs
-      .readdirSync(pathMine[1])
-      .filter((resource) =>
-        fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
-      );
-    if (behaviors.length <= 0 || resources.length <= 0) {
-      event("error", "No addons found.");
-      return;
-    }
-    const { compile } = await inquirer.prompt([
-      {
-        type: "list",
-        name: "compile",
-        message: "Compile addon or world:",
-        choices: [colors.yellow("Addon"), colors.red("World")],
-        theme: {
-          icon: {
-            cursor: "–→",
-          },
-          style: {
-            highlight: (text: string) => colors.bold(` ${text}`),
-          },
-        },
-      },
-    ]);
-    if (compile.includes("Addon")) {
-      const { nameB, nameR, namePack } = await inquirer.prompt([
+  try {
+    if (validArgs().length <= 0) return;
+    const args: string[] = validArgs() as string[];
+    const arg: string = args.filter((value) => value !== "").join("");
+    const pathMine: string[] = await getFolder();
+    if (arg.startsWith("-v") || arg.startsWith("--version")) {
+      console.log("\x1b[34mVersion: \x1b[0m1.1.7");
+    } else if (arg.startsWith("-h") || arg.startsWith("--help")) {
+      message_help();
+    } else if (arg.startsWith("-n") || arg.startsWith("--new")) {
+      const { name, description } = await inquirer.prompt([
         {
           type: "search",
-          name: "nameB",
-          message: "Behavior name:",
+          name: "name",
+          message: "Addon name:",
           source: (term) => {
-            return behaviors.filter((behavior) =>
-              behavior.toLowerCase().includes(term?.toLowerCase() || "")
-            );
-          },
-        },
-        {
-          type: "search",
-          name: "nameR",
-          message: "Resource name:",
-          source: (term) => {
-            return resources.filter((resource) =>
-              resource.toLowerCase().includes(term?.toLowerCase() || "")
-            );
+            const addons: string[] = [];
+            if (term) addons.push(term);
+            if (pathMine[0]) {
+              return addons
+                .filter(
+                  (addon) => !fs.readdirSync(pathMine[0])?.includes(addon)
+                )
+                .sort((a: string, b: string) => {
+                  if (a === term && b !== term) return -1;
+                  if (a !== term && b === term) return 1;
+                  return a.localeCompare(b);
+                });
+            }
+            return addons;
           },
         },
         {
           type: "input",
-          name: "namePack",
-          message: "Addon compilated name:",
-          required: true,
+          name: "description",
+          message: "Addon description:",
         },
       ]);
-      build_addon(nameB, nameR, namePack);
-    } else {
-      if (pathMine.length <= 0 || !pathMine[2]) {
-        event("error", "No addons/worlds found.");
-        return;
-      }
-      const worlds: string[] = fs.readdirSync(pathMine[2]);
-      if (worlds.length <= 0) {
-        event("error", "No worlds found.");
-        return;
-      }
-      const { nameW, nameB, nameR, namePack } = await inquirer.prompt([
+      const { script, language } = await inquirer.prompt([
         {
           type: "confirm",
-          name: "addon",
-          message: "Would you want to import the world with the addons?",
+          name: "script",
+          message: "Script?",
         },
         {
-          type: "search",
-          name: "nameW",
-          message: "World name:",
-          source: (term) => {
-            return worlds.filter((world) =>
-              world.toLowerCase().includes(term?.toLowerCase() || "")
-            );
+          default: "Javascript",
+          when: (data) => data.script === true,
+          type: "list",
+          name: "language",
+          message: "Language:",
+          choices: [
+            colors.cyan(`Typescript ${colors.black("(recomended)")}`),
+            colors.blueBright("Typescript empty"),
+            colors.yellow("Javascript"),
+            colors.redBright("Javascript empty"),
+          ],
+          theme: {
+            icon: {
+              cursor: "–→",
+            },
+            style: {
+              highlight: (text: string) => colors.bold(` ${text}`),
+            },
           },
         },
+      ]);
+      new_addon(name, description, script, language);
+    } else if (arg.startsWith("-b") || arg.startsWith("--build")) {
+      if (pathMine.length <= 0) {
+        event("error", "No addons found.");
+        return;
+      }
+      const behaviors: string[] = fs
+        .readdirSync(pathMine[0])
+        .filter((behavior) =>
+          fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
+        );
+      const resources: string[] = fs
+        .readdirSync(pathMine[1])
+        .filter((resource) =>
+          fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
+        );
+      if (behaviors.length <= 0 || resources.length <= 0) {
+        event("error", "No addons found.");
+        return;
+      }
+      const { compile } = await inquirer.prompt([
         {
-          when: (data) => {
-            const behaviors: string[] = fs
-              .readdirSync(pathMine[0])
-              .filter((behavior) =>
-                fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
-              );
-            const resources: string[] = fs
-              .readdirSync(pathMine[1])
-              .filter((resource) =>
-                fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
-              );
-            if (behaviors.length <= 0 || resources.length <= 0) {
-              event("error", "No addons found.");
-              return false;
-            }
-            return data.addon;
+          type: "list",
+          name: "compile",
+          message: "Compile addon or world:",
+          choices: [colors.yellow("Addon"), colors.red("World")],
+          theme: {
+            icon: {
+              cursor: "–→",
+            },
+            style: {
+              highlight: (text: string) => colors.bold(` ${text}`),
+            },
           },
+        },
+      ]);
+      if (compile.includes("Addon")) {
+        const { nameB, nameR, namePack } = await inquirer.prompt([
+          {
+            type: "search",
+            name: "nameB",
+            message: "Behavior name:",
+            source: (term) => {
+              return behaviors
+                .filter((behavior) =>
+                  behavior.toLowerCase().includes(term?.toLowerCase() || "")
+                )
+                .sort((a: string, b: string) => {
+                  if (a === term && b !== term) return -1;
+                  if (a !== term && b === term) return 1;
+                  return a.localeCompare(b);
+                });
+            },
+          },
+          {
+            type: "search",
+            name: "nameR",
+            message: "Resource name:",
+            source: (term) => {
+              return resources
+                .filter((resource) =>
+                  resource.toLowerCase().includes(term?.toLowerCase() || "")
+                )
+                .sort((a: string, b: string) => {
+                  if (a === term && b !== term) return -1;
+                  if (a !== term && b === term) return 1;
+                  return a.localeCompare(b);
+                });
+            },
+          },
+          {
+            type: "input",
+            name: "namePack",
+            message: "Addon compilated name:",
+            required: true,
+          },
+        ]);
+        build_addon(nameB, nameR, namePack);
+      } else {
+        if (pathMine.length <= 0 || !pathMine[2]) {
+          event("error", "No addons/worlds found.");
+          return;
+        }
+        const worlds: string[] = fs.readdirSync(pathMine[2]);
+        if (worlds.length <= 0) {
+          event("error", "No worlds found.");
+          return;
+        }
+        const { nameW, nameB, nameR, namePack } = await inquirer.prompt([
+          {
+            type: "confirm",
+            name: "addon",
+            message: "Would you want to import the world with the addons?",
+          },
+          {
+            type: "search",
+            name: "nameW",
+            message: "World name:",
+            source: (term) => {
+              return worlds
+                .filter((world) =>
+                  world.toLowerCase().includes(term?.toLowerCase() || "")
+                )
+                .sort((a: string, b: string) => {
+                  if (a === term && b !== term) return -1;
+                  if (a !== term && b === term) return 1;
+                  return a.localeCompare(b);
+                });
+            },
+          },
+          {
+            when: (data) => {
+              const behaviors: string[] = fs
+                .readdirSync(pathMine[0])
+                .filter((behavior) =>
+                  fs.existsSync(
+                    path.join(pathMine[0], behavior, "manifest.json")
+                  )
+                );
+              const resources: string[] = fs
+                .readdirSync(pathMine[1])
+                .filter((resource) =>
+                  fs.existsSync(
+                    path.join(pathMine[1], resource, "manifest.json")
+                  )
+                );
+              if (behaviors.length <= 0 || resources.length <= 0) {
+                event("error", "No addons found.");
+                return false;
+              }
+              return data.addon;
+            },
+            type: "search",
+            name: "nameB",
+            message: "Behavior name:",
+            source: (term) => {
+              return behaviors
+                .filter((behavior) =>
+                  behavior.toLowerCase().includes(term?.toLowerCase() || "")
+                )
+                .sort((a: string, b: string) => {
+                  if (a === term && b !== term) return -1;
+                  if (a !== term && b === term) return 1;
+                  return a.localeCompare(b);
+                });
+            },
+          },
+          {
+            when: (data) => {
+              const behaviors: string[] = fs
+                .readdirSync(pathMine[0])
+                .filter((behavior) =>
+                  fs.existsSync(
+                    path.join(pathMine[0], behavior, "manifest.json")
+                  )
+                );
+              const resources: string[] = fs
+                .readdirSync(pathMine[1])
+                .filter((resource) =>
+                  fs.existsSync(
+                    path.join(pathMine[1], resource, "manifest.json")
+                  )
+                );
+              if (behaviors.length <= 0 || resources.length <= 0) {
+                event("error", "No addons found.");
+                return false;
+              }
+              return data.addon;
+            },
+            type: "search",
+            name: "nameR",
+            message: "Resource name:",
+            source: (term) => {
+              return resources
+                .filter((resource) =>
+                  resource.toLowerCase().includes(term?.toLowerCase() || "")
+                )
+                .sort((a: string, b: string) => {
+                  if (a === term && b !== term) return -1;
+                  if (a !== term && b === term) return 1;
+                  return a.localeCompare(b);
+                });
+            },
+          },
+          {
+            type: "input",
+            name: "namePack",
+            message: "World compilated name:",
+          },
+        ]);
+        build_world(nameW, nameB, nameR, namePack);
+      }
+    } else if (arg.startsWith("-d") || arg.startsWith("--delete")) {
+      if (pathMine.length <= 0) {
+        event("error", "No addons found.");
+        return;
+      }
+      const behaviors: string[] = fs
+        .readdirSync(pathMine[0])
+        .filter((behavior) =>
+          fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
+        );
+      const resources: string[] = fs
+        .readdirSync(pathMine[1])
+        .filter((resource) =>
+          fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
+        );
+      if (behaviors.length <= 0 || resources.length <= 0) {
+        event("error", "No addons found.");
+        return;
+      }
+      const { nameB, nameR } = await inquirer.prompt([
+        {
           type: "search",
           name: "nameB",
           message: "Behavior name:",
           source: (term) => {
-            return behaviors.filter((behavior) =>
-              behavior.toLowerCase().includes(term?.toLowerCase() || "")
-            );
+            return behaviors
+              .filter((behavior) =>
+                behavior.toLowerCase().includes(term?.toLowerCase() || "")
+              )
+              .sort((a: string, b: string) => {
+                if (a === term && b !== term) return -1;
+                if (a !== term && b === term) return 1;
+                return a.localeCompare(b);
+              });
           },
         },
         {
-          when: (data) => {
-            const behaviors: string[] = fs
-              .readdirSync(pathMine[0])
-              .filter((behavior) =>
-                fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
-              );
-            const resources: string[] = fs
-              .readdirSync(pathMine[1])
-              .filter((resource) =>
-                fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
-              );
-            if (behaviors.length <= 0 || resources.length <= 0) {
-              event("error", "No addons found.");
-              return false;
-            }
-            return data.addon;
-          },
           type: "search",
           name: "nameR",
           message: "Resource name:",
           source: (term) => {
-            return resources.filter((resource) =>
-              resource.toLowerCase().includes(term?.toLowerCase() || "")
-            );
+            return resources
+              .filter((resource) =>
+                resource.toLowerCase().includes(term?.toLowerCase() || "")
+              )
+              .sort((a: string, b: string) => {
+                if (a === term && b !== term) return -1;
+                if (a !== term && b === term) return 1;
+                return a.localeCompare(b);
+              });
           },
-        },
-        {
-          type: "input",
-          name: "namePack",
-          message: "World compilated name:",
         },
       ]);
-      build_world(nameW, nameB, nameR, namePack);
-    }
-  } else if (arg.startsWith("-d") || arg.startsWith("--delete")) {
-    if (pathMine.length <= 0) {
-      event("error", "No addons found.");
-      return;
-    }
-    const behaviors: string[] = fs
-      .readdirSync(pathMine[0])
-      .filter((behavior) =>
-        fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
-      );
-    const resources: string[] = fs
-      .readdirSync(pathMine[1])
-      .filter((resource) =>
-        fs.existsSync(path.join(pathMine[1], resource, "manifest.json"))
-      );
-    if (behaviors.length <= 0 || resources.length <= 0) {
-      event("error", "No addons found.");
-      return;
-    }
-    const { nameB, nameR } = await inquirer.prompt([
-      {
-        type: "search",
-        name: "nameB",
-        message: "Behavior name:",
-        source: (term) => {
-          return behaviors.filter((behavior) =>
-            behavior.toLowerCase().includes(term?.toLowerCase() || "")
-          );
-        },
-      },
-      {
-        type: "search",
-        name: "nameR",
-        message: "Resource name:",
-        source: (term) => {
-          return resources.filter((resource) =>
-            resource.toLowerCase().includes(term?.toLowerCase() || "")
-          );
-        },
-      },
-    ]);
-    delete_addon(nameB, nameR);
-  } else if (arg.startsWith("-s") || arg.startsWith("--settings")) {
-    const { setting } = await inquirer.prompt([
-      {
-        type: "list",
-        name: "setting",
-        message: "Settings:",
-        choices: [
-          colors.green("Paths"),
-          colors.red("Manifest Json"),
-          colors.cyan("Build"),
-        ],
-        theme: {
-          icon: {
-            cursor: "–→",
-          },
-          style: {
-            highlight: (text: string) => colors.bold(` ${text}`),
-          },
-        },
-      },
-    ]);
-    if (setting.includes("Paths")) {
-      const { pathName } = await inquirer.prompt([
+      delete_addon(nameB, nameR);
+    } else if (arg.startsWith("-s") || arg.startsWith("--settings")) {
+      const { setting } = await inquirer.prompt([
         {
           type: "list",
-          name: "pathName",
-          message: "Change Path:",
+          name: "setting",
+          message: "Settings:",
           choices: [
-            colors.green(`Minecraft ${colors.gray("(com.mojang)")}`),
-            colors.red("Exports Folder Path"),
-            colors.cyan("Exports Folder Name"),
+            colors.green("Paths"),
+            colors.red("Manifest Json"),
+            colors.cyan("Build"),
           ],
           theme: {
             icon: {
@@ -314,17 +350,126 @@ async function main(): Promise<void> {
           },
         },
       ]);
-      new Settings().Paths(pathName);
-    } else if (setting.includes("Manifest")) {
-      const { manifestOption } = await inquirer.prompt([
+      if (setting.includes("Paths")) {
+        const { pathName } = await inquirer.prompt([
+          {
+            type: "list",
+            name: "pathName",
+            message: "Change Path:",
+            choices: [
+              colors.green(`Minecraft ${colors.gray("(com.mojang)")}`),
+              colors.red("Exports Folder Path"),
+              colors.cyan("Exports Folder Name"),
+            ],
+            theme: {
+              icon: {
+                cursor: "–→",
+              },
+              style: {
+                highlight: (text: string) => colors.bold(` ${text}`),
+              },
+            },
+          },
+        ]);
+        new Settings().Paths(pathName);
+      } else if (setting.includes("Manifest")) {
+        const { manifestOption } = await inquirer.prompt([
+          {
+            type: "list",
+            name: "manifestOption",
+            message: "Change Manifest Option:",
+            choices: [
+              colors.green("min_engine_version"),
+              colors.red("@minecraft/server version"),
+              colors.cyan("@minecraft/server-ui version"),
+            ],
+            theme: {
+              icon: {
+                cursor: "–→",
+              },
+              style: {
+                highlight: (text: string) => colors.bold(` ${text}`),
+              },
+            },
+          },
+        ]);
+        new Settings().Manifest(manifestOption);
+      } else {
+        const { buildType, buildNameB, buildNameR } = await inquirer.prompt([
+          {
+            type: "list",
+            name: "build",
+            message: "Build configuration:",
+            choices: [colors.green("BuildType"), colors.red("BuildName")],
+            theme: {
+              icon: {
+                cursor: "–→",
+              },
+              style: {
+                highlight: (text: string) => colors.bold(` ${text}`),
+              },
+            },
+          },
+          {
+            when: (data) => data.build.includes("BuildType"),
+            type: "list",
+            name: "buildType",
+            message:
+              "Would you like to export the essential addon folders (like blocks, items and scripts)?",
+            choices: [
+              colors.green(`Only essential ${colors.gray("(recommended)")}`),
+              colors.red("Specify folder"),
+              colors.cyan("All folders"),
+            ],
+            theme: {
+              icon: {
+                cursor: "–→",
+              },
+              style: {
+                highlight: (text: string) => colors.bold(` ${text}`),
+              },
+            },
+          },
+          {
+            when: (data) => data.build.includes("BuildName"),
+            type: "input",
+            name: "buildNameB",
+            message: "Behavior keyword if behavior and resource are the same:",
+            required: true,
+          },
+          {
+            when: (data) => data.build.includes("BuildName"),
+            type: "input",
+            name: "buildNameR",
+            message: "Resource keyword if behavior and resource are the same:",
+            required: true,
+          },
+        ]);
+        new Settings().Build(buildType || [buildNameB, buildNameR]);
+      }
+    } else if (arg.startsWith("-t") || arg.startsWith("--template")) {
+      if (pathMine.length <= 0) {
+        event("error", "No addons found.");
+        return;
+      }
+      const behaviors: string[] = fs
+        .readdirSync(pathMine[0])
+        .filter((behavior) =>
+          fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
+        );
+      if (behaviors.length <= 0) {
+        event("error", "No behaviors found.");
+        return;
+      }
+      const { templat, name } = await inquirer.prompt([
         {
           type: "list",
-          name: "manifestOption",
-          message: "Change Manifest Option:",
+          name: "templat",
+          message: "Select a template:",
           choices: [
-            colors.green("min_engine_version"),
-            colors.red("@minecraft/server version"),
-            colors.cyan("@minecraft/server-ui version"),
+            colors.green("item"),
+            colors.red("block"),
+            colors.magenta("entity"),
           ],
           theme: {
             icon: {
@@ -335,100 +480,60 @@ async function main(): Promise<void> {
             },
           },
         },
-      ]);
-      new Settings().Manifest(manifestOption);
-    } else {
-      const { buildType } = await inquirer.prompt([
         {
-          type: "list",
-          name: "buildType",
-          message:
-            "Would you like to export the essential addon folders (like blocks, items and scripts)?",
-          choices: [
-            colors.green(`Only essential ${colors.gray("(recommended)")}`),
-            colors.red("Specify folder"),
-            colors.cyan("All folders"),
-          ],
-          theme: {
-            icon: {
-              cursor: "–→",
-            },
-            style: {
-              highlight: (text: string) => colors.bold(` ${text}`),
-            },
+          type: "search",
+          name: "name",
+          message: "Behavior name:",
+          source: (term) => {
+            return behaviors
+              .filter((behavior) =>
+                behavior.toLowerCase().includes(term?.toLowerCase() || "")
+              )
+              .sort((a: string, b: string) => {
+                if (a === term && b !== term) return -1;
+                if (a !== term && b === term) return 1;
+                return a.localeCompare(b);
+              });
           },
         },
       ]);
-      new Settings().Build(buildType);
-    }
-  } else if (arg.startsWith("-t") || arg.startsWith("--template")) {
-    if (pathMine.length <= 0) {
-      event("error", "No addons found.");
-      return;
-    }
-    const behaviors: string[] = fs
-      .readdirSync(pathMine[0])
-      .filter((behavior) =>
-        fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
-      );
-    if (behaviors.length <= 0) {
-      event("error", "No behaviors found.");
-      return;
-    }
-    const { templat, name } = await inquirer.prompt([
-      {
-        type: "list",
-        name: "templat",
-        message: "Select a template:",
-        choices: [
-          colors.green("item"),
-          colors.red("block"),
-          colors.magenta("entity"),
-        ],
-        theme: {
-          icon: {
-            cursor: "–→",
-          },
-          style: {
-            highlight: (text: string) => colors.bold(` ${text}`),
+      template(templat, name);
+    } else if (arg.startsWith("start")) {
+      const behaviors: string[] = fs
+        .readdirSync(pathMine[0])
+        .filter((behavior) =>
+          fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
+        );
+      if (pathMine.length <= 0 || behaviors.length <= 0) {
+        event("error", "No behaviors found.");
+        return;
+      }
+      const { name } = await inquirer.prompt([
+        {
+          type: "search",
+          name: "name",
+          message: "Behavior name:",
+          source: (term) => {
+            return behaviors
+              .filter((behavior) =>
+                behavior.toLowerCase().includes(term?.toLowerCase() || "")
+              )
+              .sort((a: string, b: string) => {
+                if (a === term && b !== term) return -1;
+                if (a !== term && b === term) return 1;
+                return a.localeCompare(b);
+              });
           },
         },
-      },
-      {
-        type: "search",
-        name: "name",
-        message: "Behavior name:",
-        source: (term) => {
-          return behaviors.filter((behavior) =>
-            behavior.toLowerCase().includes(term?.toLowerCase() || "")
-          );
-        },
-      },
-    ]);
-    template(templat, name);
-  } else if (arg.startsWith("start")) {
-    const behaviors: string[] = fs
-      .readdirSync(pathMine[0])
-      .filter((behavior) =>
-        fs.existsSync(path.join(pathMine[0], behavior, "manifest.json"))
-      );
-    if (pathMine.length <= 0 || behaviors.length <= 0) {
-      event("error", "No behaviors found.");
-      return;
+      ]);
+      start(name);
     }
-    const { name } = await inquirer.prompt([
-      {
-        type: "search",
-        name: "name",
-        message: "Behavior name:",
-        source: (term) => {
-          return behaviors.filter((behavior) =>
-            behavior.toLowerCase().includes(term?.toLowerCase() || "")
-          );
-        },
-      },
-    ]);
-    start(name);
+  } catch (err) {
+    const error: { message: string } = err as { message: string };
+    if (!error.message.includes("SIGINT")) return console.error(err);
+    console.clear();
+    event("sucess", "Leaving...");
+    process.exit(1);
   }
 }
 
