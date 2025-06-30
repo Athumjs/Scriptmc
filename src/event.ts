@@ -7,6 +7,11 @@ export function event(event: "sucess" | "error", value: string): void {
         colors.bold(value)
       )}`
     );
+    console.log(
+      `${colors.cyan(colors.italic("  smc --help"))} ${colors.blue(
+        colors.bold(" ←– Show commands list")
+      )}`
+    );
     process.exit(0);
   } else {
     console.log(

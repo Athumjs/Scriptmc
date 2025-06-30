@@ -13,7 +13,7 @@ async function main(): Promise<void> {
     if (
       list.filter((item) => item.name === arg || item.flag === arg).length <= 0
     )
-      event("error", `Argument Invalid: ${arg}`);
+      event("error", `Command Invalid: ${arg}`);
   });
   list
     .filter((item) => item.name === args[0] || item.flag === args[0])[0]
